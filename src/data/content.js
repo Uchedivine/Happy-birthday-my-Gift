@@ -43,12 +43,12 @@ export const reasons = [
   },
   {
     text: "That adorable forehead I will tease you about for the rest of our lives 🥰",
-    media: { type: 'video', src: 'forehead.mp4', caption: 'guilty' },
+    media: { type: 'video', src: 'forehead.MP4', caption: 'guilty' },
   },
 
    {
     text: "How gentle and tender your touch always is",
-    media: { type: 'video', src: 'gentle.mp4', caption: 'Beautiful' },
+    media: { type: 'video', src: 'gentle.MP4', caption: 'Beautiful' },
   },
   //{ text: "The way you love people so fully, so quietly, so genuinely" },
   //{ text: "" },
@@ -60,12 +60,12 @@ export const reasons = [
  
      {
     text: "The joy you bring into every ordinary moment🥰",
-    media: { type: 'video', src: 'joy.mp4', caption: 'Happiness' },
+    media: { type: 'video', src: 'joy.MP4', caption: 'Happiness' },
   },
  // },
   {
     text: "Your laugh. Once I hear it, I need to hear it again immediately",
-    media: { type: 'video', src: 'laugh.mp4', caption: 'on repeat' },
+    media: { type: 'video', src: 'laugh.MP4', caption: 'on repeat' },
   },
   { text: "I wish you all your heart desires, and the very best things life has to offer 💕" },
 ]
