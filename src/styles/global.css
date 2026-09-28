@@ -19,12 +19,20 @@ body {
 .cursor {
   display: inline-block;
   width: 2px;
+  height: 1.1em;
+  vertical-align: text-bottom;
   background-color: #4a2030;
   margin-left: 2px;
+  margin-right: -4px; /* net zero layout width, so text doesn't shift */
   animation: blink 1s step-end infinite;
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+@keyframes fillbar {
+  from { width: 0; }
+  to { width: 100%; }
 }
