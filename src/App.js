@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import { preloadMedia } from './preloadMedia'
 import SplashScreen from './components/SplashScreen'
 import LoveLetter from './components/LoveLetter'
 import Reasons from './components/Reasons'
@@ -7,6 +8,8 @@ import Celebration from './components/Celebration'
 
 export default function App() {
   const [phase, setPhase] = useState('splash')
+
+  useEffect(() => { preloadMedia() }, [])
 
   // Stable callbacks so child effects don't restart on re-render.
   const toLetter = useCallback(() => setPhase('letter'), [])

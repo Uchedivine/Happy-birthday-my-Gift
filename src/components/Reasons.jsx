@@ -163,7 +163,45 @@ export default function Reasons({ onFinished }) {
     if (page.kind === 'intro') {
         content = <p style={styles.heading}>And a few reasons why...</p>
     } else if (page.kind === 'closing') {
-        content = <p style={styles.closingLine}>Enjoy your day my love 🤍</p>
+        // Collect only image media items for the photo grid
+        const allMedia = reasons
+            .map((r, i) => (r.media && r.media.type === 'image' ? { ...r.media, n: i } : null))
+            .filter(Boolean)
+
+        content = (
+            <>
+                <p style={styles.closingLine}>Enjoy your day my love 🤍</p>
+                <div style={styles.photoGrid}>
+                    {allMedia.map((media, i) => (
+                        <motion.div
+                            key={i}
+                            style={styles.photoCard}
+                            initial={{ opacity: 0, scale: 0.3, rotate: 0 }}
+                            animate={{
+                                opacity: 1,
+                                scale: 1,
+                                rotate: (i % 2 === 0 ? 1 : -1) * (Math.random() * 8 + 2)
+                            }}
+                            transition={{
+                                delay: 0.8 + i * 0.15,
+                                duration: 0.5,
+                                type: 'spring',
+                                bounce: 0.3
+                            }}
+                        >
+                            <img
+                                src={mediaUrl(media.src)}
+                                alt=""
+                                style={styles.photoImg}
+                                onError={(e) => {
+                                    e.target.parentElement.style.display = 'none'
+                                }}
+                            />
+                        </motion.div>
+                    ))}
+                </div>
+            </>
+        )
     } else if (page.kind === 'media') {
         const item = page.items[0]
         content = (
@@ -320,6 +358,30 @@ const styles = {
         fontSize: 'clamp(1.3rem, 5.5vw, 1.8rem)',
         fontStyle: 'italic',
         color: '#4a2030',
+        marginBottom: 'clamp(1rem, 3vh, 2rem)',
+    },
+    photoGrid: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 'clamp(0.8rem, 2vw, 1.2rem)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        maxWidth: '600px',
+        padding: '0 1rem',
+    },
+    photoCard: {
+        background: '#fff',
+        padding: '8px',
+        borderRadius: '4px',
+        boxShadow: '0 4px 12px rgba(74, 32, 48, 0.15)',
+        width: 'clamp(70px, 18vw, 90px)',
+        height: 'clamp(85px, 22vw, 110px)',
+    },
+    photoImg: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        borderRadius: '2px',
     },
     back: {
         position: 'absolute',

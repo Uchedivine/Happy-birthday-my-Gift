@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { mediaUrl } from '../preloadMedia'
 
 // Files live in public/media/ and are referenced by filename only.
-export const mediaUrl = src => `${process.env.PUBLIC_URL}/media/${src}`
+export { mediaUrl }
 
 export default function ReasonMedia({ media, tilt = 0, onEnded, onFail }) {
     const videoRef = useRef(null)
@@ -10,7 +11,7 @@ export default function ReasonMedia({ media, tilt = 0, onEnded, onFail }) {
     const isVideo = media.type === 'video'
 
     useEffect(() => {
-        videoRef.current?.play().catch(() => {})
+        videoRef.current?.play().catch(() => { })
     }, [])
 
     // A missing or broken file shows nothing instead of a broken icon.

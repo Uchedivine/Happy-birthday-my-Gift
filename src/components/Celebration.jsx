@@ -1,7 +1,8 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 const emojis = ['🎈', '🎀', '✨', '💕', '🌸']
+const CANDLE_COUNT = 5
 
 function Confetti() {
     const [pieces, setPieces] = useState([])
@@ -50,29 +51,79 @@ function Confetti() {
     )
 }
 
-function Cake() {
+// A small cake drawn with CSS, with candles you can blow out by tapping.
+function Cake({ blown, onBlow }) {
     return (
-        <motion.div
-            style={styles.cakeWrapper}
+        <motion.button
+            type="button"
+            style={styles.cakeButton}
+            onClick={onBlow}
+            disabled={blown}
+            aria-label="Blow out the candles"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8, type: 'spring', bounce: 0.4 }}
         >
-            {/* Candles */}
-
-
-            {/* Cake layers */}
-            <div style={styles.cakeTop}>
-                <span style={styles.cakeEmoji}>🎂</span>
+            <div style={styles.candleRow}>
+                {Array.from({ length: CANDLE_COUNT }, (_, i) => (
+                    <div key={i} style={styles.candle}>
+                        <div style={styles.flameSlot}>
+                            <AnimatePresence>
+                                {!blown ? (
+                                    <motion.div
+                                        key="flame"
+                                        style={styles.flame}
+                                        animate={{
+                                            scale: [1, 1.15, 0.95, 1.1, 1],
+                                            rotate: [-3, 3, -2, 2, -3],
+                                        }}
+                                        transition={{
+                                            duration: 1.2 + i * 0.15,
+                                            repeat: Infinity,
+                                            ease: 'easeInOut',
+                                        }}
+                                        // Each flame goes out a beat after the last.
+                                        exit={{
+                                            opacity: 0,
+                                            scale: 0.2,
+                                            transition: { duration: 0.25, delay: i * 0.12 },
+                                        }}
+                                    />
+                                ) : (
+                                    <motion.div
+                                        key="smoke"
+                                        style={styles.smoke}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: [0, 0.7, 0], y: -38, scale: 1.8 }}
+                                        transition={{ duration: 1.6, delay: 0.15 + i * 0.12 }}
+                                    />
+                                )}
+                            </AnimatePresence>
+                        </div>
+                        <div style={styles.candleBody} />
+                    </div>
+                ))}
             </div>
-        </motion.div>
+            <div style={styles.layerTop} />
+            <div style={styles.layerBottom} />
+        </motion.button>
     )
 }
 
 export default function Celebration({ onReplay }) {
+    const [blown, setBlown] = useState(false)
+    const [party, setParty] = useState(false)
+
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [])
+
+    // The party starts a moment after the last flame goes out.
+    useEffect(() => {
+        if (!blown) return
+        const t = setTimeout(() => setParty(true), 1400)
+        return () => clearTimeout(t)
+    }, [blown])
 
     return (
         <motion.div
@@ -82,7 +133,7 @@ export default function Celebration({ onReplay }) {
             exit={{ opacity: 0, transition: { duration: 1.5 } }}
             transition={{ duration: 1.5 }}
         >
-            <Confetti />
+            {party && <Confetti />}
 
             {/* Balloons */}
             <div style={styles.balloonRow}>
@@ -90,49 +141,86 @@ export default function Celebration({ onReplay }) {
                     <motion.span
                         key={i}
                         style={{ fontSize: '2.5rem' }}
-                        animate={{ y: [0, -12, 0] }}
-                        transition={{
-                            duration: 2 + i * 0.3,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
-                            delay: i * 0.2,
-                        }}
+                        initial={{ opacity: 0 }}
+                        animate={party ? { opacity: 1, y: [0, -12, 0] } : { opacity: 0 }}
+                        transition={
+                            party
+                                ? {
+                                      opacity: { duration: 0.8 },
+                                      y: {
+                                          duration: 2 + i * 0.3,
+                                          repeat: Infinity,
+                                          ease: 'easeInOut',
+                                          delay: i * 0.2,
+                                      },
+                                  }
+                                : { duration: 0.3 }
+                        }
                     >
                         {b}
                     </motion.span>
                 ))}
             </div>
 
-            <Cake />
+            <Cake blown={blown} onBlow={() => setBlown(true)} />
 
-            {/* Message */}
-            <motion.div
-                style={styles.messageWrapper}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.8, duration: 1.2 }}
-            >
-                <p style={styles.wish}>May today be as beautiful</p>
-                <p style={styles.wish}>as you are. 🌸</p>
-                <motion.p
-                    style={styles.sub}
+            {/* Prompt, then the message once the candles are out */}
+            <div style={styles.messageArea}>
+                <AnimatePresence mode="wait">
+                    {!blown && (
+                        <motion.div
+                            key="prompt"
+                            style={styles.messageWrapper}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                            transition={{ delay: 1.6, duration: 1 }}
+                        >
+                            <p style={styles.wish}>Make a wish… 🤍</p>
+                            <motion.p
+                                style={styles.sub}
+                                animate={{ opacity: [0.5, 1, 0.5] }}
+                                transition={{ duration: 2.2, repeat: Infinity }}
+                            >
+                                tap the cake to blow out the candles
+                            </motion.p>
+                        </motion.div>
+                    )}
+
+                    {party && (
+                        <motion.div
+                            key="message"
+                            style={styles.messageWrapper}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1.2 }}
+                        >
+                            <p style={styles.wish}>May today be as beautiful</p>
+                            <p style={styles.wish}>as you are. 🌸</p>
+                            <motion.p
+                                style={styles.sub}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1.2, duration: 1.5 }}
+                            >
+                                Happy Birthday, my love 🤍
+                            </motion.p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {party && (
+                <motion.button
+                    style={styles.replay}
+                    onClick={onReplay}
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 3, duration: 1.5 }}
+                    animate={{ opacity: 0.8 }}
+                    transition={{ delay: 5, duration: 1.5 }}
                 >
-                    Happy Birthday, my love 🤍
-                </motion.p>
-            </motion.div>
-
-            <motion.button
-                style={styles.replay}
-                onClick={onReplay}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.8 }}
-                transition={{ delay: 7, duration: 1.5 }}
-            >
-                watch again 🤍
-            </motion.button>
+                    watch again 🤍
+                </motion.button>
+            )}
         </motion.div>
     )
 }
@@ -162,45 +250,89 @@ const styles = {
         gap: '1.5rem',
         zIndex: 1,
     },
-    cakeWrapper: {
+
+    // ---- Cake ----
+    cakeButton: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        background: 'none',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        cursor: 'pointer',
         zIndex: 1,
+        WebkitTapHighlightColor: 'transparent',
     },
     candleRow: {
         display: 'flex',
-        gap: '1.2rem',
-        marginBottom: '0.3rem',
+        gap: 'clamp(0.7rem, 3vw, 1.1rem)',
         alignItems: 'flex-end',
+        marginBottom: '-2px',
+        zIndex: 1,
     },
     candle: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
     },
+    flameSlot: {
+        position: 'relative',
+        width: '14px',
+        height: '26px',
+    },
     flame: {
-        fontSize: '1.2rem',
-        display: 'block',
-        lineHeight: 1,
+        position: 'absolute',
+        bottom: '2px',
+        left: '2px',
+        width: '10px',
+        height: '18px',
+        borderRadius: '50% 50% 50% 50% / 65% 65% 35% 35%',
+        background: 'radial-gradient(circle at 50% 70%, #fff3b0 10%, #ffb347 55%, #ff7a45 100%)',
+        boxShadow: '0 0 12px 4px rgba(255, 190, 90, 0.55)',
+        transformOrigin: 'bottom center',
+    },
+    smoke: {
+        position: 'absolute',
+        bottom: '4px',
+        left: '3px',
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        background: 'rgba(120, 100, 110, 0.5)',
+        filter: 'blur(3px)',
     },
     candleBody: {
-        width: '10px',
-        height: '28px',
-        background: 'linear-gradient(to bottom, #f9d6e3, #f4a7c0)',
+        width: '8px',
+        height: '26px',
+        background: 'linear-gradient(to bottom, #fff, #f4a7c0)',
         borderRadius: '3px',
-        marginTop: '2px',
     },
-    cakeTop: {
-        fontSize: 'clamp(4rem, 15vw, 6rem)',
-        lineHeight: 1,
+    layerTop: {
+        width: 'clamp(150px, 46vw, 210px)',
+        height: '44px',
+        background: '#f9d6e3',
+        borderRadius: '14px 14px 4px 4px',
+        boxShadow: 'inset 0 -6px 0 #f4a7c0',
     },
-    cakeEmoji: {
-        fontSize: 'clamp(4.5rem, 18vw, 7rem)',
+    layerBottom: {
+        width: 'clamp(190px, 58vw, 260px)',
+        height: '56px',
+        background: '#f4a7c0',
+        borderRadius: '6px 6px 14px 14px',
+        marginTop: '-2px',
+        boxShadow: '0 8px 20px rgba(74, 32, 48, 0.15)',
+    },
+
+    // ---- Text ----
+    messageArea: {
+        minHeight: '9rem',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        zIndex: 1,
     },
     messageWrapper: {
         textAlign: 'center',
-        zIndex: 1,
         marginTop: '1rem',
     },
     wish: {
