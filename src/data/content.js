@@ -36,7 +36,11 @@ export const reasons = [
     media: { type: 'image', src: 'eyes.jpg', caption: 'that smile' },
   },
   //{ text: "The way you walk into a room and instantly make it better" },
- // { text: "Those big bright eyes full of warmth, magic, and mischief" },
+   {
+    text: "Even when you choose to be wild and mischievious 😂",
+    media: { type: 'image', src: 'wild.jpg', caption: '😂😂' },
+  },
+ // { text: " and " },
   {
     text: "Your hugs, they fix everything, every single time",
     media: { type: 'image', src: 'hug.jpg', caption: 'my favourite place' },
@@ -47,7 +51,7 @@ export const reasons = [
   },
 
    {
-    text: "How gentle and tender your touch always is",
+    text: "Those big bright eyes full of warmth, magic, and love",
     media: { type: 'video', src: 'gentle.MP4', caption: 'Beautiful' },
   },
   //{ text: "The way you love people so fully, so quietly, so genuinely" },
@@ -67,5 +71,7 @@ export const reasons = [
     text: "Your laugh. Once I hear it, I need to hear it again immediately",
     media: { type: 'video', src: 'laugh.MP4', caption: 'on repeat' },
   },
-  { text: "I wish you all your heart desires, and the very best things life has to offer 💕" },
+  { text: "I wish you all your heart desires, and the very best things life has to offer 💕" ,
+    media: { type: 'image', src: 'happy.jpg', caption: 'my favourite person' },
+  },
 ]
