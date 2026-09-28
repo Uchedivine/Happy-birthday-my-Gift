@@ -13,6 +13,7 @@ function Confetti() {
             delay: Math.random() * 3,
             duration: 3 + Math.random() * 4,
             emoji: emojis[Math.floor(Math.random() * emojis.length)],
+            spin: Math.random() > 0.5 ? 1 : -1,
             size: 14 + Math.random() * 18,
         }))
         setPieces(items)
@@ -32,7 +33,7 @@ function Confetti() {
                     }}
                     animate={{
                         y: ['0vh', '110vh'],
-                        rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
+                        rotate: [0, 360 * p.spin],
                         opacity: [1, 1, 0],
                     }}
                     transition={{
@@ -68,7 +69,7 @@ function Cake() {
     )
 }
 
-export default function Celebration() {
+export default function Celebration({ onReplay }) {
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [])
@@ -122,6 +123,16 @@ export default function Celebration() {
                     Happy Birthday, my love 🤍
                 </motion.p>
             </motion.div>
+
+            <motion.button
+                style={styles.replay}
+                onClick={onReplay}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.8 }}
+                transition={{ delay: 7, duration: 1.5 }}
+            >
+                watch again 🤍
+            </motion.button>
         </motion.div>
     )
 }
@@ -197,6 +208,18 @@ const styles = {
         fontStyle: 'italic',
         color: '#4a2030',
         lineHeight: 1.8,
+    },
+    replay: {
+        zIndex: 1,
+        background: 'none',
+        border: '1px solid rgba(201, 114, 138, 0.5)',
+        borderRadius: '999px',
+        color: '#c9728a',
+        fontFamily: 'inherit',
+        fontStyle: 'italic',
+        fontSize: '0.95rem',
+        padding: '0.5rem 1.2rem',
+        cursor: 'pointer',
     },
     sub: {
         marginTop: '1.5rem',

@@ -55,16 +55,23 @@ function FallingStars() {
 }
 
 export default function LoveLetter({ onFinished }) {
-    const bottomRef = useRef(null)
-    const { displayed, done } = useTypewriter(letter, {
+    const cursorRef = useRef(null)
+    const { typed, rest, done, skip } = useTypewriter(letter, {
         speed: 75,
         humanize: true,
         onFinished,
     })
 
+    // Keep the cursor comfortably in view. This only scrolls when the cursor
+    // nears the bottom edge (about once per line), so it stays smooth.
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-    }, [displayed])
+        const el = cursorRef.current
+        if (!el) return
+        const margin = 160
+        const { bottom } = el.getBoundingClientRect()
+        const overflow = bottom - (window.innerHeight - margin)
+        if (overflow > 0) window.scrollBy({ top: overflow, behavior: 'smooth' })
+    }, [typed])
 
     return (
         <motion.div
@@ -77,15 +84,16 @@ export default function LoveLetter({ onFinished }) {
             <FallingStars />
 
             <p style={styles.text}>
-                {displayed.split('\n').map((line, i) => (
-                    <span key={i}>
-                        {line}
-                        <br />
-                    </span>
-                ))}
-                {!done && <span className="cursor" />}
-                <span ref={bottomRef} style={{ display: 'inline-block', width: '0' }} />
+                {typed}
+                {!done && <span className="cursor" ref={cursorRef} />}
+                <span style={{ visibility: 'hidden' }} aria-hidden="true">{rest}</span>
             </p>
+
+            {!done && (
+                <button style={styles.skip} onClick={skip}>
+                    skip ›
+                </button>
+            )}
         </motion.div>
     )
 }
@@ -119,5 +127,21 @@ const styles = {
         fontStyle: 'italic',
         position: 'relative',
         zIndex: 1,
+        whiteSpace: 'pre-wrap',
+    },
+    skip: {
+        position: 'fixed',
+        bottom: '1rem',
+        right: '1rem',
+        zIndex: 2,
+        background: 'none',
+        border: 'none',
+        color: '#c9728a',
+        opacity: 0.7,
+        fontFamily: 'inherit',
+        fontStyle: 'italic',
+        fontSize: '0.95rem',
+        cursor: 'pointer',
+        padding: '0.5rem 0.75rem',
     }
 }

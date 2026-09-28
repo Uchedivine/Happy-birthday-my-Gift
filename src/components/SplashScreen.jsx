@@ -1,6 +1,12 @@
 import { motion } from 'framer-motion'
+import { useEffect } from 'react'
 
 export default function SplashScreen({ onComplete }) {
+    useEffect(() => {
+        const t = setTimeout(onComplete, 4000)
+        return () => clearTimeout(t)
+    }, [onComplete])
+
     return (
         <motion.div
             style={styles.container}
@@ -8,7 +14,6 @@ export default function SplashScreen({ onComplete }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5 }}
-            onAnimationComplete={() => setTimeout(onComplete, 2500)}
         >
             <motion.p
                 style={styles.text}
@@ -16,7 +21,7 @@ export default function SplashScreen({ onComplete }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, duration: 1.2 }}
             >
-                Happy Birthday, my Princess 🤍
+                Happy Birthday, my Bright Sunshine🌞🤍
             </motion.p>
         </motion.div>
     )
